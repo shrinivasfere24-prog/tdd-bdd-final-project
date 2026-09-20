@@ -1,0 +1,49 @@
+apiVersion: tekton.dev/v1
+kind: Task
+metadata:
+  name: cleanup
+spec:
+  description: Clean the workspace before running the tests.
+  workspaces:
+    - name: source
+  steps:
+    - name: cleanup
+      image: alpine:3.20
+      script: |
+        #!/bin/sh
+        set -e
+        echo "Cleaning workspace..."
+        rm -rf /workspace/source/__pycache__
+        rm -rf /workspace/source/.pytest_cache
+        rm -rf /workspace/source/*.pyc
+        echo "Workspace cleanup completed."
+
+---
+apiVersion: tekton.dev/v1
+kind: Task
+metadata:
+  name: nose
+spec:
+  description: Install dependencies and run unit tests with nose.
+  workspaces:
+    - name: source
+  steps:
+    - name: run-tests
+      image: python:3.10
+      workingDir: /workspace/source
+      script: |
+        #!/bin/bash
+        set -e
+
+        echo "Installing test dependencies..."
+        python -m pip install --upgrade pip
+        pip install flake8 nose
+
+        if [ -f requirements.txt ]; then
+          pip install -r requirements.txt
+        fi
+
+        echo "Running unit tests with nose..."
+        nosetests -v
+
+        echo "Unit tests completed successfully."
