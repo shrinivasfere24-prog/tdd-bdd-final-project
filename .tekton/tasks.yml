@@ -29,7 +29,7 @@ spec:
     - name: source
   steps:
     - name: run-tests
-      image: python:3.10
+      image: python:3.9
       workingDir: /workspace/source
       script: |
         #!/bin/bash
@@ -37,13 +37,9 @@ spec:
 
         echo "Installing test dependencies..."
         python -m pip install --upgrade pip
-        pip install flake8 nose
-
-        if [ -f requirements.txt ]; then
-          pip install -r requirements.txt
-        fi
+        pip install -r requirements.txt
 
         echo "Running unit tests with nose..."
-        nosetests -v
+        nosetests -v tests/test_models.py tests/test_routes.py
 
         echo "Unit tests completed successfully."

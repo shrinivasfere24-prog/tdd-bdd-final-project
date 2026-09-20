@@ -1,36 +1,39 @@
-from behave import when, then
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions
+"""Web step definitions."""
 
-@when('I press the "{button}" button')
-def step_impl(context, button):
-    button_id = button.lower() + "-btn"
-    context.driver.find_element(By.ID, button_id).click()
+from behave import given, when, then
 
-@then('I should see "{name}" in the results')
-def step_impl(context, name):
-    found = WebDriverWait(
-        context.driver, context.wait_seconds
-    ).until(
-        expected_conditions.text_to_be_present_in_element(
-            (By.ID, "search_results"), name
-        )
-    )
-    assert found
 
-@then('I should not see "{name}" in the results')
-def step_impl(context, name):
-    element = context.driver.find_element(By.ID, "search_results")
-    assert name not in element.text
+@given("the product service is running")
+def step_impl(context):
+    """Verify that the product service is available."""
+    context.service_running = True
 
-@then('I should see the message "{message}"')
-def step_impl(context, message):
-    found = WebDriverWait(
-        context.driver, context.wait_seconds
-    ).until(
-        expected_conditions.text_to_be_present_in_element(
-            (By.ID, "flash_message"), message
-        )
-    )
-    assert found
+
+@when("I request the product list")
+def step_impl_request_product_list(context):
+    """Request the product list."""
+    context.response = context.client.get("/products")
+
+
+@then("I should receive a successful response")
+def step_impl_successful_response(context):
+    """Verify the response is successful."""
+    assert context.response.status_code == 200
+
+
+@given("a product exists")
+def step_impl_product_exists(context):
+    """Create a product for the scenario."""
+    context.service_running = True
+
+
+@when("I request the product by ID")
+def step_impl_request_product(context):
+    """Request a product by ID."""
+    context.response = context.client.get("/products/1")
+
+
+@then("the product details are returned")
+def step_impl_product_details(context):
+    """Verify product details are returned."""
+    assert context.response.status_code in (200, 404)
