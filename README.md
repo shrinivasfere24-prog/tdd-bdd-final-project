@@ -1,3 +1,11 @@
+# ci-cd-final-project
+
+## Project Name
+ci-cd-final-project
+
+## Description
+A CI/CD project demonstrating automated linting, unit testing, container image building, and application deployment using GitHub Actions and OpenShift Pipelines.
+
 # TDD-BDD Final Project
 
 Required peer-graded submission files for the Product Catalog TDD/BDD project.
